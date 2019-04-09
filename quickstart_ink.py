@@ -4,6 +4,7 @@ import pickle
 import os.path
 import argparse
 import time
+from datetime import timedelta 
 
 from PIL import Image, ImageFont, ImageDraw
 from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
@@ -16,26 +17,7 @@ from google.auth.transport.requests import Request
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-def main():
-    scale_size = 1
-    padding = 0
-    colour = "black"
-    inky_display = InkyPHAT(colour)
-    inky_display.set_border(inky_display.BLACK)
-    # Top and bottom y-coordinates for the white strip
-    y_top =  int(inky_display.HEIGHT * (1.0 / 10.0))
-    y_bottom = y_top  + int(inky_display.HEIGHT * (1.0 / 10.0))
-
-    imgclr = Image.new("P", (inky_display.WIDTH, inky_display.HEIGHT))          
-    img = Image.new("P", (inky_display.WIDTH, inky_display.HEIGHT))
-    draw = ImageDraw.Draw(img)
-    # Load the fonts
-
-    intuitive_font = ImageFont.truetype(Intuitive, int(18 * scale_size))
-    hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(19 * scale_size))
-
-
-
+def getGoogleCalendar():
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
@@ -65,7 +47,27 @@ def main():
     events_result = service.events().list(calendarId='primary', timeMin=now,
                                         maxResults=10, singleEvents=True,
                                         orderBy='startTime').execute()
-    events = events_result.get('items', [])
+    return events_result.get('items', [])
+    
+
+
+def main():
+    scale_size = 1
+    padding = 0
+    colour = "black"
+    inky_display = InkyPHAT(colour)
+    inky_display.set_border(inky_display.BLACK)
+    # Top and bottom y-coordinates for the white strip
+    y_top =  int(inky_display.HEIGHT * (1.0 / 10.0))
+    y_bottom = y_top  + int(inky_display.HEIGHT * (1.0 / 10.0))
+
+    imgclr = Image.new("P", (inky_display.WIDTH, inky_display.HEIGHT))          
+    img = Image.new("P", (inky_display.WIDTH, inky_display.HEIGHT))
+    draw = ImageDraw.Draw(img)
+    # Load the fonts
+
+    intuitive_font = ImageFont.truetype(Intuitive, int(18 * scale_size))
+    hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(19 * scale_size))
     
     name_y = y_top
    
@@ -76,14 +78,22 @@ def main():
     # when finished start again
     name_x = 0
     i = 0
+    polltime  = datetime.datetime.now() - timedelta(minutes=2)
+    now = datetime.datetime.now()
     # Loop forever
     while i < 1:
+      if polltime <  datetime.datetime.now():
+           polltime = datetime.datetime.now() + timedelta(minutes=2)
+           events = getGoogleCalendar()
+           #print('while loop' + polltime.strftime("%H%M"))
+
+ 
       for event in events: 
          draw.rectangle((0, 0, inky_display.WIDTH, inky_display.HEIGHT), fill='black', outline='black')
          name_w, name_h = intuitive_font.getsize(event['summary'])
          no_lines = round(name_w / inky_display.WIDTH) 
          no_left =  name_w % inky_display.WIDTH
-         now = datetime.datetime.now()
+                  
          draw.text((name_x, int(inky_display.HEIGHT * (0.5 / 10.0))),\
          now.strftime("%Y-%m-%d %H:%M"),inky_display.BLACK,font=hanken_medium_font)
          no_loop = no_lines
