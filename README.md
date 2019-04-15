@@ -29,3 +29,5 @@ you have listed on Google Calendar. The program will run forever. You may want t
 would want to set up a cron job for this.
 
 The script has also been updated to poll Google Calendar for any updates on a regular basis. These timeframes can be updated from within  the Script.
+
+Further details on <a href="http://emomonkey.github.io">Further Details/</a>
