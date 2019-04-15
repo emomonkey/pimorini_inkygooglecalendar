@@ -1,3 +1,8 @@
+<!--
+  Title: Google Calender Script for Pimorini EInk PHAT Display
+  Description: Google Calender Script for Pimorini EInk PHAT Display
+  Author: emos
+  -->
 # Google Calender Script for Pimorini EInk PHAT Display
 
 I have put together a little python script which lists your most recent events you have put on the Google Calendar.
